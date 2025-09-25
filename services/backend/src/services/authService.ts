@@ -5,6 +5,7 @@ import { User, UserRow } from '../types/user';
 import jwtUtils from '../utils/jwt';
 import ejs from 'ejs';
 import bcrypt from 'bcrypt'; //agregado para hashing seguro
+import sanitize from 'sanitize-html'; // agregado para sanitizar campos usados en el mail
 
 const RESET_TTL = 1000 * 60 * 60;         // 1h
 const INVITE_TTL = 1000 * 60 * 60 * 24 * 7; // 7d
@@ -55,11 +56,21 @@ class AuthService {
       </html>`;
     const htmlBody = ejs.render(template);
 
+    // agregado para solucionar Temple Command Injection
+    const safeFirst = sanitize(user.first_name ?? '', { allowedTags: [], allowedAttributes: {} });
+    const safeLast  = sanitize(user.last_name  ?? '', { allowedTags: [], allowedAttributes: {} });
+    const safeUser  = sanitize(user.username   ?? '', { allowedTags: [], allowedAttributes: {} });
+
+    const linkSafe = `${process.env.FRONTEND_URL}/activate-user?token=${invite_token}&username=${encodeURIComponent(safeUser)}`;
+
+    const inlineTpl = `<html><body><h1>Hello <%= first_name %> <%= last_name %></h1><p>Click <a href="<%= link %>">here</a> to activate your account.</p></body></html>`;
+    const safeHtmlBody = ejs.render(inlineTpl, { first_name: safeFirst, last_name: safeLast, link: linkSafe });
+
     await transporter.sendMail({
       from: "info@example.com",
       to: user.email,
       subject: 'Activate your account',
-      html: htmlBody
+      html: safeHtmlBody // se cambia para usar el HTML seguro generado, antes estaba htmlBody
     });
   }
 
