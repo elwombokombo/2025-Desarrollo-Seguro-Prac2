@@ -3,17 +3,18 @@ import routes from '../controllers/authController';
 
 const router = Router();
 
-// healthcheck
 router.get('/', routes.ping);
 
-// auth
 router.post('/login', routes.login);
+
+// POST /auth/forgot-password
 router.post('/forgot-password', routes.forgotPassword);
+
+// POST /auth/reset-password
 router.post('/reset-password', routes.resetPassword);
+
+// POST /auth/set-password
 router.post('/set-password', routes.setPassword);
 
-// users
-router.post('/users', routes.createUser);
-router.put('/users/:id', routes.updateUser);
 
 export default router;
