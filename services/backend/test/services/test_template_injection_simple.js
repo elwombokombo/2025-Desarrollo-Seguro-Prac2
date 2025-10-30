@@ -1,9 +1,3 @@
-/**
- * Pruebas de regresión: Template Injection en creación de usuario
- * Estas pruebas usan Jest y supertest para verificar que el backend
- * no procese entradas maliciosas como plantillas.
- */
-
 const request = require("supertest");
 const nodemailer = require("nodemailer");
 
