@@ -1,13 +1,11 @@
 const request = require("supertest");
 const nodemailer = require("nodemailer");
 
-// Mock del transporte de correo (para no enviar mails reales)
+
 jest.mock("nodemailer");
 const sendMailMock = jest.fn().mockResolvedValue({ messageId: "mocked-id" });
 nodemailer.createTransport.mockReturnValue({ sendMail: sendMailMock });
 
-// Configuración del servidor backend
-// Ajustá el path según donde exportás la app (ej: ../src/index.js o ../src/app.js)
 const app = require("../src/index");
 
 // Entradas maliciosas que intentarían causar inyección de plantilla
@@ -60,7 +58,7 @@ describe("Mitigación de Template Injection en createUser", () => {
 
       const html = sendMailMock.mock.calls[0][0].html.toLowerCase();
 
-      // No debe ejecutar código ni mostrar etiquetas inseguras
+      
       expect(html).not.toContain("<script");
       expect(html).not.toContain("process");
       expect(html).not.toContain("constructor(");
